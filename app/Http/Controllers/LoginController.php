@@ -11,17 +11,18 @@ use App\Models\User;
 
 class LoginController extends Controller
 {
-
-    function login_act(Request $request){ 
+    
+    function login_act(Request $request){  
+        
         $validator = Validator::make($request->all(), [
             'email' =>'required',  
             'password' => 'required' 
         ]); 
+        
         if ($validator->fails()) { // All Error  
             return $this->retJson(false, 'Errors', $validator->errors());
         }          
-        $sql = User::where('terverifikasi','Y')
-                        ->where('email', $request->email); 
+        $sql = User::where('level','Admin')->where('email', $request->email);  
   
         if( $sql->count() > 0 ){  
             $row = $sql->get(); 
@@ -29,11 +30,20 @@ class LoginController extends Controller
             if($cek_password !=  true ){ 
                 return $this->retJson(false, 'Errors',  ["password" => ["Kata sandi tidak sesuai"] ]  );  
             }            
+            
+            if (  Auth::attempt( ['email' =>  $request->email,  'password' =>  $request->password ]  ) ) {  
+                return $this->retJson(true, 'Login Berhasil !',  [] );   
+            } 
+
         }
-          
-        return $this->retJson(false, 'Errors',   ["email" => ["{$request->email}  belum terdaftar"] ] );
+ 
+        return $this->retJson(false, 'Error',   ["email" => "email bellum terdaftar"] );
     } 
 
+    function logout(){
+        Auth::logout();  
+        return redirect('login');
+    }
     
     function retJson($status, $msg, $data){ 
         return response()->json([
@@ -42,4 +52,5 @@ class LoginController extends Controller
             'data' =>  $data
         ]);
     }
+    
 }
