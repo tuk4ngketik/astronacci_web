@@ -15,13 +15,11 @@ class CekAdmin
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
-    {
-         
-        if (!Auth::check()) { 
-            return redirect()->route('login');
+    { 
+        if ( Auth::check() == true ) {  
+            return $next($request);
         }
-         
-        return $next($request);
+        return redirect()->route('login'); 
 
     }
     
