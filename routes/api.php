@@ -2,14 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MobileController;  
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
- 
+Route::get('/', function(){  return 'successed'; }); // Test route
 
-use App\Http\Controllers\MobileappsVer1;     
-// Route::get('/', [MobileappsVer1::class, 'def']);
-Route::get('/', function(){
-    return 'successed';
-}); 
+Route::post('/login', [MobileController::class, 'login']); 
+Route::post('/register', [MobileController::class, 'register']); 
