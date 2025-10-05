@@ -9,12 +9,12 @@
 
 ## About Astronacci 
 
-- ** Download **
-- **Config Database pada file .ENV**
-- **Jalankan Migaration : "php artisan migrate" **
-- **Setelah melakukan migration maka User untuk level  Admin sudah Automatis di buat**
-- **User : admin@mail.com **
-- **password : admin123**
+- Download 
+- Config Database pada file .ENV
+- Jalankan Migaration : "php artisan migrate" 
+- Setelah melakukan migration maka User untuk level  Admin sudah Automatis di buat
+- User : admin@mail.com 
+- password : admin123
 
 
 
