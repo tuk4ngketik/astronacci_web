@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 Route::middleware([CekAdmin::class])->group(function () { 
     
     Route::get('/',[DashboardController::class, 'list_user']);
+    Route::get('/logout',[LoginController::class, 'logout']);
 
 });
 
