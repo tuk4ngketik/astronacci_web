@@ -14,7 +14,14 @@ class DashboardController extends Controller
         return view('dashboard.list_user', $data);
     }
 
-    function detail_user(){
+    function detail_user($id=null){
+        if($id == null){
+            return $this->list_user();
+        }
+
+        $row = User::where('id', $id)->get();
+        $data = [ 'row' => $row[0] ]; 
+        return view('dashboard.detail_user', $data);
 
     }
 

@@ -12,7 +12,10 @@
  <tbody>
     @foreach($row as $item)
     <tr>
-        <td>{{ $item->email }}</td> <td>{{ $item->name}}</td> <td>{{ $item->created_at}}</td> <td></td>
+        <td>
+           <a href="{{ url('detail-user') }}/{{ $item->id }}">{{ $item->email }}</a>
+        </td> 
+        <td>{{ $item->name}}</td> <td>{{ $item->created_at}}</td> <td></td>
     </tr>
     @endforeach
 </tbody>
