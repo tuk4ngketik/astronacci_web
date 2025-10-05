@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request; 
-use Illuminate\Support\Facades\Hash; 
-use Illuminate\Validation\Rule; 
+use Illuminate\Support\Facades\Hash;  
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Exception;
@@ -53,12 +52,12 @@ class MobileController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required', 
             'password' => 'required', 
-            'name' => 'required|min:5|max:100|regex:/^[a-zA-z\ ]+$/i', 
+            'name' => 'required|min:5|max:100|regex:/^[a-zA-z\ ]+$/i',  
             'profile_image' => 'required'
         ]);  
 
         if ($validator->fails()) {
-            return $this->retJson(false, 'Lengkapi semua data', $validator->errors()  ) ;  
+            return $this->retJson(false,  $validator->errors()->first(), null ) ;  
         }
         
         $cek_email = User::where("email", $request->email)->count();
@@ -72,7 +71,9 @@ class MobileController extends Controller
                 "name" => $request->name,
                 "email" => $request->email,
                 "password" => $passwd,
-                "profile_image" => $request->profile_image
+                "profile_image" => $request->profile_image,
+                "created_at" => now(),
+                "updated_at" => now()
             ];
             User::insert($data);
             return $this->retJson(true, 'Pendaftaran berhasil !', null); 
@@ -82,6 +83,71 @@ class MobileController extends Controller
         } 
 
     }
+
+    function users(Request $request, $page =null){
+        
+        if( $this->isClient( $request ) == false ){
+            return $this->retJson(false, 'Invalid request', null); 
+        }    
+
+        // 1. Definisikan jumlah data per halaman (LIMIT)
+        $perPage = 7; 
+        
+
+        // 3. Hitung OFFSET (SKIP) 
+        $page ??= 1;
+        $curr_page = intval ( $page );
+        $skip = ( $page < 2 ) ? 0 :  ($page - 1) * $perPage;
+        $next_page =  $page +  1; 
+        
+ 
+        // 4. Lakukan query Eloquent
+        try{
+            $users = User::orderBy('id', 'asc')  
+                        ->skip($skip)        // Menentukan OFFSET
+                        ->take($perPage)     // Menentukan LIMIT
+                        ->select("id", "name", "email", "created_at", 
+                                    "profile_image", "level"
+                                )->get(); 
+            if( count($users) < 1){ 
+                $next_page = $curr_page   ; 
+            } 
+            $data = [
+                "curr_page" =>$curr_page,
+                "next_page" => $next_page ,
+                "data" => $users
+            ];
+            return $this->retJson(true, 'List User', $data); 
+        }catch(Exception $e){
+            return $this->retJson(false, 'Terjadi kesalahan, 111', [ $e->getMessage() ]); 
+        } 
+        
+    }
+
+    function cari(Request $request){
+
+        if( $this->isClient( $request ) == false ){
+            return $this->retJson(false, 'Invalid request', null); 
+        }  
+        try{
+            $row = User::where('email', "LIKE",  "%{$request->cari}%")
+                        ->orwhere('name', "LIKE",  "%{$request->cari}%")
+                        ->select("id", "name", "email", "created_at", 
+                                    "profile_image", "level"
+                                )
+                        ->get(); 
+            $data = [
+                "curr_page" => 0,
+                "next_page" => 0,
+                "data" => $row
+            ];
+            return $this->retJson(true, 'Sukses pencarian',  $data );   
+        }
+        catch(Exception $e){
+            return $this->retJson(false, 'Terjadi Kesalahan',  $e->getMessage()  );   
+        }
+
+    } 
 
     
     function isClient($request) {  
