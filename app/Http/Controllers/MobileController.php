@@ -84,6 +84,48 @@ class MobileController extends Controller
 
     }
 
+    function ganti_passwd(Request $request){ 
+        if( $this->isClient( $request ) == false ){
+            return $this->retJson(false, 'Invalid request', null); 
+        }    
+
+        $validator = Validator::make($request->all(), [
+            'passwd_lama' => 'required',  
+            'passwd_baru' => 'required',   
+        ]);  
+
+        if ($validator->fails()) {
+            return $this->retJson(false,  $validator->errors()->first(),    null);  
+        }  
+        try{ 
+ 
+            $row = User::where('email', $request->email);
+            if( $row->count() < 1 ){ 
+                return $this->retJson(false, 'Email belum terdaftar',  null );  
+            }      
+            $row = $row->get();
+
+            $cek_password  = Hash::check(  $request->passwd_lama, $row[0]->password);
+            if($cek_password !=  true ){ 
+                return $this->retJson(false, 'Password lama tidak sesuai', null );   
+            }    
+
+            
+             $data = ['password' =>  Hash::make($request->passwd_baru) ]; 
+             User::where('email', $request->email)->update($data);  
+             return $this->retJson(true, 'Ganti Password berhasil !', null  );  
+
+        }
+        catch(Exception $e){
+            return $this->retJson(false, 'Terjadi kesalahan', $e->getMessage()  );   
+
+        }
+
+        return $this->retJson(false, 'DBG Sukses', null );  
+
+
+    }
+
     function users(Request $request, $page =null){
         
         if( $this->isClient( $request ) == false ){
